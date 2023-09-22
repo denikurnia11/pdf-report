@@ -4,16 +4,20 @@ namespace App\Controllers;
 
 use App\Models\CrudModel;
 use App\Models\Form2Model;
+use App\Models\Form3Model;
+use App\Models\Form3PersalinanModel;
 use CodeIgniter\HTTP\RedirectResponse;
 use Dompdf\Dompdf;
 
 class Home extends BaseController
 {
-    protected $CrudModel, $Form2Model;
+    protected $CrudModel, $Form2Model, $Form3Model, $Form3PersalinanModel;
     public function __construct()
     {
         $this->CrudModel = new CrudModel();
         $this->Form2Model = new Form2Model();
+        $this->Form3Model = new Form3Model();
+        $this->Form3PersalinanModel = new Form3PersalinanModel();
     }
 
     public function index(): string
@@ -22,6 +26,7 @@ class Home extends BaseController
         return view('welcome_message', $data);
     }
 
+    // ========================================================= FORM 2 =========================================================
     public function list_form2(): string
     {
         $data = [
@@ -147,13 +152,62 @@ class Home extends BaseController
         $dompdf->stream('my.pdf', array('Attachment' => 0));
     }
 
+    // ========================================================= FORM 3 =========================================================
+    public function list_form3(): string
+    {
+        $data = [
+            'form3data' => $this->Form3Model->orderBy('id', 'DESC')->findAll()
+        ];
+        return view('lists/form3', $data);
+    }
+
+    public function form3(): string
+    {
+        return view('forms/form3');
+    }
+    public function save_form3(): RedirectResponse
+    {
+        $data = $this->request->getVar();
+        $dataTemp = $this->request->getVar();
+
+        unset($data['tgl_partus']);
+        unset($data['tempat_partus']);
+        unset($data['umur_hamil']);
+        unset($data['jenis_persalinan']);
+        unset($data['penolong_persalinan']);
+        unset($data['penyulit']);
+        unset($data['jkbb']);
+        unset($data['keadaan_anak']);
+        // dd($data);
+        $this->Form3Model->insert($data);
+        $id = $this->Form3Model->insertID();
+
+        for ($i = 0; $i < count($dataTemp['tgl_partus']); $i++) {
+            $this->Form3PersalinanModel->insert([
+                'tgl_partus' => $dataTemp['tgl_partus'][$i],
+                'tempat_partus' => $dataTemp['tempat_partus'][$i],
+                'umur_hamil' => $dataTemp['umur_hamil'][$i],
+                'jenis_persalinan' => $dataTemp['jenis_persalinan'][$i],
+                'penolong_persalinan' => $dataTemp['penolong_persalinan'][$i],
+                'penyulit' => $dataTemp['penyulit'][$i],
+                'jkbb' => $dataTemp['jkbb'][$i],
+                'keadaan_anak' => $dataTemp['keadaan_anak'][$i],
+                'form3_id' => $id,
+            ]);
+        }
+
+        return redirect()->to(base_url('list-form3'));
+    }
+
 
     public function downloadForm3($id)
     {
-        // $data = $this->Form2Model->find($id);
+        $data = $this->Form3Model->find($id);
+        $data['tabel'] = $this->Form3PersalinanModel->where('form3_id ', $id)->findAll();
+
         // instantiate and use the dompdf class
         $dompdf = new Dompdf();
-        $dompdf->loadHtml(view('pdf/form3'));
+        $dompdf->loadHtml(view('pdf/form3', $data));
 
         // (Optional) Setup the paper size and orientation
         $dompdf->setPaper('A4', 'potrait');
