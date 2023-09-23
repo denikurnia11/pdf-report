@@ -6,18 +6,22 @@ use App\Models\CrudModel;
 use App\Models\Form2Model;
 use App\Models\Form3Model;
 use App\Models\Form3PersalinanModel;
+use App\Models\Form4Model;
+use App\Models\Form4TableModel;
 use CodeIgniter\HTTP\RedirectResponse;
 use Dompdf\Dompdf;
 
 class Home extends BaseController
 {
-    protected $CrudModel, $Form2Model, $Form3Model, $Form3PersalinanModel;
+    protected $CrudModel, $Form2Model, $Form3Model, $Form3PersalinanModel, $Form4Model, $Form4TableModel;
     public function __construct()
     {
         $this->CrudModel = new CrudModel();
         $this->Form2Model = new Form2Model();
         $this->Form3Model = new Form3Model();
         $this->Form3PersalinanModel = new Form3PersalinanModel();
+        $this->Form4Model = new Form4Model();
+        $this->Form4TableModel = new Form4TableModel();
     }
 
     public function index(): string
@@ -149,7 +153,7 @@ class Home extends BaseController
 
         // Render the HTML as PDF
         $dompdf->render();
-        $dompdf->stream('my.pdf', array('Attachment' => 0));
+        $dompdf->stream('form2.pdf', array('Attachment' => 0));
     }
 
     // ========================================================= FORM 3 =========================================================
@@ -214,6 +218,70 @@ class Home extends BaseController
 
         // Render the HTML as PDF
         $dompdf->render();
-        $dompdf->stream('my.pdf', array('Attachment' => 0));
+        $dompdf->stream('form3.pdf', array('Attachment' => 0));
+    }
+
+    // ========================================================= FORM 4 =========================================================
+    public function list_form4(): string
+    {
+        $data = [
+            'form4data' => $this->Form4Model->orderBy('id', 'DESC')->findAll()
+        ];
+        return view('lists/form4', $data);
+    }
+
+    public function form4(): string
+    {
+        return view('forms/form4');
+    }
+
+    public function save_form4(): RedirectResponse
+    {
+        $data = $this->request->getVar();
+        $dataTemp = $this->request->getVar();
+
+        unset($data['jenis_tindakan']);
+        unset($data['lokasi']);
+        unset($data['tgl_mulai']);
+        unset($data['tgl_selesai']);
+        unset($data['total_hari']);
+        unset($data['tgl_infeksi']);
+        unset($data['tgl_infeksi2']);
+        // dd($data);
+        $this->Form4Model->insert($data);
+        $id = $this->Form4Model->insertID();
+
+        for ($i = 0; $i < count($dataTemp['jenis_tindakan']); $i++) {
+            $this->Form4TableModel->insert([
+                'jenis_tindakan' => $dataTemp['jenis_tindakan'][$i],
+                'lokasi' => $dataTemp['lokasi'][$i],
+                'tgl_mulai' => $dataTemp['tgl_mulai'][$i],
+                'tgl_selesai' => $dataTemp['tgl_selesai'][$i],
+                'total_hari' => $dataTemp['total_hari'][$i],
+                'tgl_infeksi' => $dataTemp['tgl_infeksi'][$i],
+                'tgl_infeksi2' => $dataTemp['tgl_infeksi2'][$i],
+                'form4_id' => $id,
+            ]);
+        }
+
+
+        return redirect()->to(base_url('list-form4'));
+    }
+
+    public function downloadForm4($id)
+    {
+        $data = $this->Form4Model->find($id);
+        $data['tabel'] = $this->Form4TableModel->where('form4_id', $id)->findAll();
+        // dd($data);
+        // instantiate and use the dompdf class
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml(view('pdf/form4', $data));
+
+        // (Optional) Setup the paper size and orientation
+        $dompdf->setPaper('A4', 'potrait');
+
+        // Render the HTML as PDF
+        $dompdf->render();
+        $dompdf->stream('form4.pdf', array('Attachment' => 0));
     }
 }

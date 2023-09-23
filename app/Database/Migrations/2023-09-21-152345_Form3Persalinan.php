@@ -55,7 +55,7 @@ class Form3Persalinan extends Migration
         $this->forge->addPrimaryKey('id');
 
         // Tambahkan kunci asing dengan ON DELETE dan ON UPDATE CASCADE
-        $this->forge->addForeignKey('form3_id', 'form3', 'id', '', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('form3_id', 'form3', 'id', 'CASCADE', 'CASCADE');
 
         $this->forge->createTable('form3_persalinan');
     }
