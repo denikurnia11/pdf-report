@@ -21,3 +21,8 @@ $routes->get('/list-form4', 'Home::list_form4');
 $routes->get('/download-form4/(:num)', 'Home::downloadForm4/$1');
 $routes->get('/form4', 'Home::form4');
 $routes->post('/form4', 'Home::save_form4');
+
+$routes->get('/list-form6', 'Home::list_form6');
+$routes->get('/download-form6/(:num)', 'Home::downloadForm6/$1');
+$routes->get('/form6', 'Home::form6');
+$routes->post('/form6', 'Home::save_form6');

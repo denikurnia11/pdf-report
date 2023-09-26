@@ -8,12 +8,13 @@ use App\Models\Form3Model;
 use App\Models\Form3PersalinanModel;
 use App\Models\Form4Model;
 use App\Models\Form4TableModel;
+use App\Models\Form6Model;
 use CodeIgniter\HTTP\RedirectResponse;
 use Dompdf\Dompdf;
 
 class Home extends BaseController
 {
-    protected $CrudModel, $Form2Model, $Form3Model, $Form3PersalinanModel, $Form4Model, $Form4TableModel;
+    protected $CrudModel, $Form2Model, $Form3Model, $Form3PersalinanModel, $Form4Model, $Form4TableModel, $Form6Model;
     public function __construct()
     {
         $this->CrudModel = new CrudModel();
@@ -22,6 +23,7 @@ class Home extends BaseController
         $this->Form3PersalinanModel = new Form3PersalinanModel();
         $this->Form4Model = new Form4Model();
         $this->Form4TableModel = new Form4TableModel();
+        $this->Form6Model = new Form6Model();
     }
 
     public function index(): string
@@ -283,5 +285,45 @@ class Home extends BaseController
         // Render the HTML as PDF
         $dompdf->render();
         $dompdf->stream('form4.pdf', array('Attachment' => 0));
+    }
+
+
+    // ========================================================= FORM 6 =========================================================
+    public function list_form6(): string
+    {
+        $data = [
+            'form6data' => $this->Form6Model->orderBy('id', 'DESC')->findAll()
+        ];
+        return view('lists/form6', $data);
+    }
+    public function form6(): string
+    {
+        return view('forms/form6');
+    }
+    public function save_form6(): RedirectResponse
+    {
+        $data = $this->request->getVar();
+        // dd($data);
+        $this->Form6Model->insert($data);
+        $id = $this->Form6Model->insertID();
+
+        return redirect()->to(base_url('list-form6'));
+    }
+
+
+    public function downloadForm6($id)
+    {
+        $data = $this->Form6Model->find($id);
+
+        // instantiate and use the dompdf class
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml(view('pdf/form6', $data));
+
+        // (Optional) Setup the paper size and orientation
+        $dompdf->setPaper('A4', 'potrait');
+
+        // Render the HTML as PDF
+        $dompdf->render();
+        $dompdf->stream('form6.pdf', array('Attachment' => 0));
     }
 }
