@@ -9,12 +9,13 @@ use App\Models\Form3PersalinanModel;
 use App\Models\Form4Model;
 use App\Models\Form4TableModel;
 use App\Models\Form6Model;
+use App\Models\Form7Model;
 use CodeIgniter\HTTP\RedirectResponse;
 use Dompdf\Dompdf;
 
 class Home extends BaseController
 {
-    protected $CrudModel, $Form2Model, $Form3Model, $Form3PersalinanModel, $Form4Model, $Form4TableModel, $Form6Model;
+    protected $CrudModel, $Form2Model, $Form3Model, $Form3PersalinanModel, $Form4Model, $Form4TableModel, $Form6Model, $Form7Model;
     public function __construct()
     {
         $this->CrudModel = new CrudModel();
@@ -24,6 +25,7 @@ class Home extends BaseController
         $this->Form4Model = new Form4Model();
         $this->Form4TableModel = new Form4TableModel();
         $this->Form6Model = new Form6Model();
+        $this->Form7Model = new Form7Model();
     }
 
     public function index(): string
@@ -325,5 +327,44 @@ class Home extends BaseController
         // Render the HTML as PDF
         $dompdf->render();
         $dompdf->stream('form6.pdf', array('Attachment' => 0));
+    }
+
+    // ========================================================= FORM 7 =========================================================
+    public function list_form7(): string
+    {
+        $data = [
+            'form7data' => $this->Form7Model->orderBy('id', 'DESC')->findAll()
+        ];
+        return view('lists/form7', $data);
+    }
+    public function form7(): string
+    {
+        return view('forms/form7');
+    }
+    public function save_form7(): RedirectResponse
+    {
+        $data = $this->request->getVar();
+        // dd($data);
+        $this->Form7Model->insert($data);
+        $id = $this->Form7Model->insertID();
+
+        return redirect()->to(base_url('list-form7'));
+    }
+
+
+    public function downloadForm7($id)
+    {
+        $data = $this->Form7Model->find($id);
+
+        // instantiate and use the dompdf class
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml(view('pdf/form7', $data));
+
+        // (Optional) Setup the paper size and orientation
+        $dompdf->setPaper('A4', 'potrait');
+
+        // Render the HTML as PDF
+        $dompdf->render();
+        $dompdf->stream('form7.pdf', array('Attachment' => 0));
     }
 }
