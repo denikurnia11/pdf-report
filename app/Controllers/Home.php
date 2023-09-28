@@ -10,12 +10,14 @@ use App\Models\Form4Model;
 use App\Models\Form4TableModel;
 use App\Models\Form6Model;
 use App\Models\Form7Model;
+use App\Models\Form8Model;
+use App\Models\Form9Model;
 use CodeIgniter\HTTP\RedirectResponse;
 use Dompdf\Dompdf;
 
 class Home extends BaseController
 {
-    protected $CrudModel, $Form2Model, $Form3Model, $Form3PersalinanModel, $Form4Model, $Form4TableModel, $Form6Model, $Form7Model;
+    protected $CrudModel, $Form2Model, $Form3Model, $Form3PersalinanModel, $Form4Model, $Form4TableModel, $Form6Model, $Form7Model, $Form8Model, $Form9Model;
     public function __construct()
     {
         $this->CrudModel = new CrudModel();
@@ -26,6 +28,8 @@ class Home extends BaseController
         $this->Form4TableModel = new Form4TableModel();
         $this->Form6Model = new Form6Model();
         $this->Form7Model = new Form7Model();
+        $this->Form8Model = new Form8Model();
+        $this->Form9Model = new Form9Model();
     }
 
     public function index(): string
@@ -366,5 +370,81 @@ class Home extends BaseController
         // Render the HTML as PDF
         $dompdf->render();
         $dompdf->stream('form7.pdf', array('Attachment' => 0));
+    }
+    // ========================================================= FORM 8 =========================================================
+    public function list_form8(): string
+    {
+        $data = [
+            'form8data' => $this->Form8Model->orderBy('id', 'DESC')->findAll()
+        ];
+        return view('lists/form8', $data);
+    }
+    public function form8(): string
+    {
+        return view('forms/form8');
+    }
+    public function save_form8(): RedirectResponse
+    {
+        $data = $this->request->getVar();
+        // dd($data);
+        $this->Form8Model->insert($data);
+        $id = $this->Form8Model->insertID();
+
+        return redirect()->to(base_url('list-form8'));
+    }
+
+
+    public function downloadForm8($id)
+    {
+        $data = $this->Form8Model->find($id);
+
+        // instantiate and use the dompdf class
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml(view('pdf/form8', $data));
+
+        // (Optional) Setup the paper size and orientation
+        $dompdf->setPaper('A4', 'potrait');
+
+        // Render the HTML as PDF
+        $dompdf->render();
+        $dompdf->stream('form8.pdf', array('Attachment' => 0));
+    }
+    // ========================================================= FORM 9 =========================================================
+    public function list_form9(): string
+    {
+        $data = [
+            'form9data' => $this->Form9Model->orderBy('id', 'DESC')->findAll()
+        ];
+        return view('lists/form9', $data);
+    }
+    public function form9(): string
+    {
+        return view('forms/form9');
+    }
+    public function save_form9(): RedirectResponse
+    {
+        $data = $this->request->getVar();
+        // dd($data);
+        $this->Form9Model->insert($data);
+        $id = $this->Form9Model->insertID();
+
+        return redirect()->to(base_url('list-form9'));
+    }
+
+
+    public function downloadForm9($id)
+    {
+        // $data = $this->Form9Model->find($id);
+
+        // instantiate and use the dompdf class
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml(view('pdf/form9'));
+
+        // (Optional) Setup the paper size and orientation
+        $dompdf->setPaper('A4', 'potrait');
+
+        // Render the HTML as PDF
+        $dompdf->render();
+        $dompdf->stream('form9.pdf', array('Attachment' => 0));
     }
 }

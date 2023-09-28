@@ -31,3 +31,13 @@ $routes->get('/list-form7', 'Home::list_form7');
 $routes->get('/download-form7/(:num)', 'Home::downloadForm7/$1');
 $routes->get('/form7', 'Home::form7');
 $routes->post('/form7', 'Home::save_form7');
+
+$routes->get('/list-form8', 'Home::list_form8');
+$routes->get('/download-form8/(:num)', 'Home::downloadForm8/$1');
+$routes->get('/form8', 'Home::form8');
+$routes->post('/form8', 'Home::save_form8');
+
+$routes->get('/list-form9', 'Home::list_form9');
+$routes->get('/download-form9/(:num)', 'Home::downloadForm9/$1');
+$routes->get('/form9', 'Home::form9');
+$routes->post('/form9', 'Home::save_form9');
