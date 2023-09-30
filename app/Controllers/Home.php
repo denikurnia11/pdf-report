@@ -434,11 +434,11 @@ class Home extends BaseController
 
     public function downloadForm9($id)
     {
-        // $data = $this->Form9Model->find($id);
+        $data = $this->Form9Model->find($id);
 
         // instantiate and use the dompdf class
         $dompdf = new Dompdf();
-        $dompdf->loadHtml(view('pdf/form9'));
+        $dompdf->loadHtml(view('pdf/form9', $data));
 
         // (Optional) Setup the paper size and orientation
         $dompdf->setPaper('A4', 'potrait');

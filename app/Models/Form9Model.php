@@ -7,7 +7,7 @@ use CodeIgniter\Model;
 class Form9Model extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'form9s';
+    protected $table            = 'form9';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
